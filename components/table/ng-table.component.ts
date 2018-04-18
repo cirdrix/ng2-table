@@ -27,7 +27,16 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
         </td>
       </tr>
         <tr *ngFor="let row of rows">
-          <td (click)="cellClick(row, column.name)" *ngFor="let column of columns" [innerHtml]="sanitize(getData(row, column.name))"></td>
+          <td (click)="cellClick(row, column.name)" *ngFor="let column of columns">
+              <div *ngIf="!column.selectable" [innerHtml]="sanitize(getData(row, column.name))">
+              </div>
+              <div class="checkbox c-checkbox" *ngIf="column.selectable">
+                <label>
+                  <input type="checkbox" (change)="selection(row, $event, $event.target.checked)" [checked]="getData(row, column.name)">
+                  <span class="fa fa-check"></span>
+                </label>
+              </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -118,5 +127,14 @@ export class NgTableComponent {
 
   public cellClick(row:any, column:any):void {
     this.cellClicked.emit({row, column});
+  }
+  
+  public selection(row: any, event: Event, checked: boolean) {
+    row.IsSelected = checked;
+    let value = {
+      row: row,
+      event: event,
+      checked: checked
+    };
   }
 }
