@@ -19,7 +19,13 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
       <tbody>
       <tr *ngIf="showFilterRow">
         <td *ngFor="let column of columns">
-          <input *ngIf="column.filtering" placeholder="{{column.filtering.placeholder}}"
+			<div class="checkbox c-checkbox" *ngIf="column.selectable">
+				<label>
+					<input type="checkbox" (click)="selAllClick(column.name, $event.target.checked, config)">
+					<span class="fa fa-check"></span>
+				</label>
+			</div>
+			<input *ngIf="column.filtering" placeholder="{{column.filtering.placeholder}}"
                  [ngTableFiltering]="column.filtering"
                  class="form-control"
                  style="width: auto;"
@@ -136,5 +142,13 @@ export class NgTableComponent {
       event: event,
       checked: checked
     };
+  }
+  
+  public selAllClick(column: any, checked: boolean, config: any, page: any = { page: this.page, itemsPerPage: this.itemsPerPage }): void {
+    const filteredData = this.changeFilter(this.devices, this.config);
+    filteredData.forEach(fd => fd.IsSelected = checked);
+    const sortedData = this.changeSort(filteredData, this.config);
+    this.rows = page && config.paging ? this.changePage(page, sortedData) : sortedData;
+    this.length = sortedData.length;
   }
 }
