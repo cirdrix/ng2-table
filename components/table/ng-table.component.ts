@@ -19,17 +19,17 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
       <tbody>
       <tr *ngIf="showFilterRow">
         <td *ngFor="let column of columns">
-			<div class="checkbox c-checkbox" *ngIf="column.selectable">
-				<label>
-					<input type="checkbox" (click)="selAllClick(column.name, $event.target.checked, config)">
-					<span class="fa fa-check"></span>
-				</label>
-			</div>
-			<input *ngIf="column.filtering" placeholder="{{column.filtering.placeholder}}"
-                 [ngTableFiltering]="column.filtering"
-                 class="form-control"
-                 style="width: auto;"
-                 (tableChanged)="onChangeTable(config)"/>
+          <div class="checkbox c-checkbox" *ngIf="column.selectable">
+            <label>
+              <input type="checkbox" (click)="selAllClick($event.target.checked, config)">
+              <span class="fa fa-check"></span>
+            </label>
+          </div>
+          <input *ngIf="column.filtering" placeholder="{{column.filtering.placeholder}}"
+                    [ngTableFiltering]="column.filtering"
+                    class="form-control"
+                    style="width: auto;"
+                    (tableChanged)="onChangeTable(config)"/>
         </td>
       </tr>
         <tr *ngFor="let row of rows">
@@ -66,6 +66,7 @@ export class NgTableComponent {
   // Outputs (Events)
   @Output() public tableChanged:EventEmitter<any> = new EventEmitter();
   @Output() public cellClicked:EventEmitter<any> = new EventEmitter();
+  @Output() public selAllClicked:EventEmitter<any> = new EventEmitter();
 
   public showFilterRow:Boolean = false;
 
@@ -144,11 +145,7 @@ export class NgTableComponent {
     };
   }
   
-  public selAllClick(column: any, checked: boolean, config: any, page: any = { page: this.page, itemsPerPage: this.itemsPerPage }): void {
-    const filteredData = this.changeFilter(this.devices, this.config);
-    filteredData.forEach(fd => fd.IsSelected = checked);
-    const sortedData = this.changeSort(filteredData, this.config);
-    this.rows = page && config.paging ? this.changePage(page, sortedData) : sortedData;
-    this.length = sortedData.length;
+  public selAllClick(checked: boolean, config: any): void {
+	  this.selAllClicked.emit({checked, config});
   }
 }
